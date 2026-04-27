@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'car_detail_page.dart'; // Import halaman detail mobil
 import 'owner_page.dart'; // Import halaman pemilik
+import 'profile/profil.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -58,10 +59,19 @@ class _DashboardPageState extends State<DashboardPage> {
                     // AppBar manual
                     Row(
                       children: [
-                        CircleAvatar(
-                          // ignore: deprecated_member_use
-                          backgroundColor: Colors.white.withOpacity(0.8),
-                          child: const Icon(Icons.person, color: Colors.black54),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ProfilScreen(),
+                              ),
+                            );
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: Colors.white.withOpacity(0.8),
+                            child: const Icon(Icons.person, color: Colors.black54),
+                          ),
                         ),
                         const SizedBox(width: 12),
                         const Column(
