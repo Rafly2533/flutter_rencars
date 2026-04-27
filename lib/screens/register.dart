@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rencars/sevices/api_service.dart';
+import '../services/api_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -9,8 +11,9 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
+  String _selectedRole = 'customer'; // Default role: customer
   
-  // Controllers untuk mengambil input
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -26,16 +29,16 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Background hitam untuk Scaffold
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
           "Registrasi",
-          style: TextStyle(color: Colors.white), // Ubah jadi putih agar terlihat di background hitam
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white), // Ubah jadi putih
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -49,7 +52,6 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
         child: Container(
-          // Overlay gelap agar teks lebih terbaca
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.5),
           ),
@@ -58,8 +60,6 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                
-                // Title tambahan
                 const Text(
                   "Buat Akun Baru",
                   style: TextStyle(
@@ -77,20 +77,55 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                
                 _buildInput("Nama", Icons.person, controller: _nameController),
                 const SizedBox(height: 16),
                 _buildInput("Email", Icons.email, controller: _emailController),
                 const SizedBox(height: 16),
                 _buildInput("Password", Icons.lock, isPassword: true, controller: _passwordController),
+                
+                const SizedBox(height: 16),
+                
+                // ========== DROPDOWN PILIH ROLE ==========
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedRole,
+                      isExpanded: true,
+                      dropdownColor: Colors.grey[900],
+                      style: const TextStyle(color: Colors.white),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'customer',
+                          child: Text('Customer (Penyewa Mobil)'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'owner',
+                          child: Text('Owner (Pemilik Mobil yang menyewakan)'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedRole = value!;
+                        });
+                      },
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: 24),
 
-                _buildButton("Daftar"),
+                // Tombol daftar dengan loading indicator
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _buildButton("Daftar"),
                 
                 const SizedBox(height: 20),
                 
-                // Link ke login
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -180,8 +215,8 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
   
-  // Fungsi handle registrasi
-  void _handleRegister() {
+  // ========== FUNGSI REGISTER KE API ==========
+  Future<void> _handleRegister() async {
     String name = _nameController.text.trim();
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
@@ -191,41 +226,60 @@ class _RegisterPageState extends State<RegisterPage> {
       _showErrorDialog('Nama tidak boleh kosong');
       return;
     }
-    
     if (email.isEmpty) {
       _showErrorDialog('Email tidak boleh kosong');
       return;
     }
-    
     if (!email.contains('@')) {
       _showErrorDialog('Email tidak valid');
       return;
     }
-    
     if (password.isEmpty) {
       _showErrorDialog('Password tidak boleh kosong');
       return;
     }
-    
     if (password.length < 6) {
       _showErrorDialog('Password minimal 6 karakter');
       return;
     }
-    
-    // Jika berhasil
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Registrasi berhasil! Silakan login'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-    
-    // Kembali ke halaman login
-    Navigator.pop(context);
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final apiService = ApiService();
+      await apiService.register(
+        name: name,
+        email: email,
+        password: password,
+        role: _selectedRole,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registrasi berhasil! Silakan login'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      
+      // Kembali ke halaman login
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      _showErrorDialog(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
   
-  // Fungsi show error dialog
   void _showErrorDialog(String message) {
     showDialog(
       context: context,

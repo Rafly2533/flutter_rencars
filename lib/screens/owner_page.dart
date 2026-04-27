@@ -21,6 +21,7 @@ class OwnerPage extends StatelessWidget {
           ),
           // OVERLAY GELAP (agar teks lebih terbaca)
           Container(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.4),
           ),
           
@@ -62,7 +63,9 @@ class OwnerPage extends StatelessWidget {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
+                                // ignore: deprecated_member_use
                                 Colors.deepPurple.withOpacity(0.9),
+                                // ignore: deprecated_member_use
                                 Colors.deepPurple.shade700.withOpacity(0.9),
                               ],
                             ),
@@ -218,10 +221,12 @@ class OwnerPage extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        // ignore: deprecated_member_use
         color: Colors.white.withOpacity(0.95), // Background putih transparan
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 2),

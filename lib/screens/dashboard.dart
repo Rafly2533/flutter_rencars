@@ -44,6 +44,7 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           // OVERLAY GELAP (opsional, agar teks lebih terbaca)
           Container(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.3),
           ),
           // KONTEN DI ATAS BACKGROUND
@@ -58,6 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     Row(
                       children: [
                         CircleAvatar(
+                          // ignore: deprecated_member_use
                           backgroundColor: Colors.white.withOpacity(0.8),
                           child: const Icon(Icons.person, color: Colors.black54),
                         ),
@@ -95,6 +97,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     // Search Bar
                     Container(
                       decoration: BoxDecoration(
+                        // ignore: deprecated_member_use
                         color: Colors.white.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -177,6 +180,7 @@ class _DashboardPageState extends State<DashboardPage> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
+              // ignore: deprecated_member_use
               color: Colors.white.withOpacity(0.9),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -200,10 +204,12 @@ class _DashboardPageState extends State<DashboardPage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
+        // ignore: deprecated_member_use
         color: Colors.white.withOpacity(0.95),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
@@ -407,6 +413,7 @@ class _DashboardPageState extends State<DashboardPage> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),

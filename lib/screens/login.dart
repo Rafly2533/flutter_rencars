@@ -19,6 +19,7 @@ class LandingPage extends StatelessWidget {
         child: Container(
           // Overlay gelap agar teks lebih terbaca (opsional)
           decoration: BoxDecoration(
+            // ignore: deprecated_member_use
             color: const Color.fromARGB(255, 192, 190, 190).withOpacity(0.4),
           ),
           child: SafeArea(
@@ -117,6 +118,7 @@ class LandingPage extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
+                        // ignore: deprecated_member_use
                         backgroundColor: Colors.white.withOpacity(0.9),
                         foregroundColor: Colors.blue,
                         shape: RoundedRectangleBorder(

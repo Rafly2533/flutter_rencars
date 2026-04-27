@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rencars/sevices/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/api_service.dart';
 import 'register.dart';
-import 'dashboard.dart'; // pastikan dashboard.dart sudah dibuat
+import 'dashboard.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,8 +14,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
+  bool _isLoading = false; // Tambahan untuk loading state
   
-  // Controllers untuk mengambil input dari text field
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -31,14 +34,13 @@ class _LoginPageState extends State<LoginPage> {
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/back2.png'), // Ganti dengan path foto Anda
-            fit: BoxFit.cover, // Cover seluruh layar
+            image: AssetImage('assets/images/back2.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: Container(
-          // Overlay gelap agar teks lebih terbaca (opsional)
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
+            color: Colors.black.withOpacity(0.5),
           ),
           child: SafeArea(
             child: SingleChildScrollView(
@@ -46,8 +48,6 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 40),
-
-                  // Title
                   RichText(
                     text: const TextSpan(
                       children: [
@@ -70,38 +70,28 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-
                   const Text(
                     "Rental Mobil",
                     style: TextStyle(color: Colors.white70),
                   ),
-
                   const SizedBox(height: 40),
-
-                  // Email
                   _buildInput(
                     hint: "Email",
                     icon: Icons.email_outlined,
                     controller: _emailController,
                   ),
-
                   const SizedBox(height: 16),
-
-                  // Password
                   _buildInput(
                     hint: "Password",
                     icon: Icons.lock_outline,
                     isPassword: true,
                     controller: _passwordController,
                   ),
-
                   const SizedBox(height: 8),
-
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // Tambahkan fungsi forgot password di sini
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Fitur forgot password sedang dalam pengembangan'),
@@ -115,25 +105,20 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Login Button
-                  GestureDetector(
-                    onTap: _handleLogin,
-                    child: _buildButton("Login"),
-                  ),
-
+                  // Tombol login dengan loading indicator
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : GestureDetector(
+                          onTap: _handleLogin,
+                          child: _buildButton("Login"),
+                        ),
                   const SizedBox(height: 30),
-
                   const Text(
                     "Don't have any account?",
                     style: TextStyle(color: Colors.white70),
                   ),
-
                   const SizedBox(height: 10),
-
-                  // Register Button
                   OutlinedButton(
                     onPressed: () {
                       Navigator.push(
@@ -155,10 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Social icons (dummy)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -173,9 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 30),
-
                   const Text(
                     "Help  •  Privacy Policy",
                     style: TextStyle(color: Colors.white60),
@@ -189,64 +169,81 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Fungsi untuk handle login
-  void _handleLogin() {
+  // ========== FUNGSI LOGIN KE API ==========
+  Future<void> _handleLogin() async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    // Validasi sederhana
     if (email.isEmpty) {
       _showErrorDialog('Email tidak boleh kosong');
       return;
     }
-
     if (password.isEmpty) {
       _showErrorDialog('Password tidak boleh kosong');
       return;
     }
-
-    // Validasi email sederhana (minimal mengandung @)
     if (!email.contains('@')) {
       _showErrorDialog('Email tidak valid');
       return;
     }
 
-    // Contoh validasi sederhana (bisa diganti dengan logic login sesungguhnya)
-    // Untuk demo, semua email dan password yang tidak kosong akan berhasil login
-    // Anda bisa mengganti dengan validasi ke API/database nantinya
-    
-    // Contoh validasi spesifik (opsional):
-    // if (email == 'admin@rentcars.com' && password == 'admin123') {
-    //   _loginSuccess();
-    // } else {
-    //   _showErrorDialog('Email atau password salah');
-    // }
-    
-    // Untuk sementara, semua input yang valid akan berhasil login
-    _loginSuccess();
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final apiService = ApiService();
+      final response = await apiService.login(
+        email: email,
+        password: password,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Login berhasil!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
+        ),
+      );
+
+      // Ambil role dari response
+      final prefs = await SharedPreferences.getInstance();
+      final role = prefs.getString('role') ?? 'customer';
+
+      // Navigasi berdasarkan role
+      if (role == 'admin') {
+        // TODO: Navigasi ke halaman admin
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardPage()),
+        );
+      } else if (role == 'owner') {
+        // TODO: Navigasi ke halaman owner
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardPage()),
+        );
+      } else {
+        // Customer
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardPage()),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showErrorDialog(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
-  // Fungsi ketika login berhasil
-  void _loginSuccess() {
-    // Tampilkan pesan sukses
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Login berhasil!'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 1),
-      ),
-    );
-
-    // Navigasi ke dashboard
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const DashboardPage(),
-      ),
-    );
-  }
-
-  // Fungsi untuk menampilkan error dialog
   void _showErrorDialog(String message) {
     showDialog(
       context: context,

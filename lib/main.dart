@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'package:flutter_rencars/screens/login.dart';
 // import 'login.dart'; // tetap boleh ada kalau dipakai di landing
 
 void main() {
