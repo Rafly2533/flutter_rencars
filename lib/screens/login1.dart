@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rencars/sevices/api_service.dart';
+import 'package:flutter_rencars/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import 'register.dart';
