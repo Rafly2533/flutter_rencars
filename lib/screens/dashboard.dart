@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'car_detail_page.dart'; // Import halaman detail mobil
 import 'owner_page.dart'; // Import halaman pemilik
-import 'profile/profil.dart';
+import 'Profile/profil.dart';
+// ignore: unused_import
+import '../../services/api_service.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -64,11 +66,12 @@ class _DashboardPageState extends State<DashboardPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ProfilScreen(),
+                                builder: (context) => const ProfileScreen(),
                               ),
                             );
                           },
                           child: CircleAvatar(
+                            // ignore: deprecated_member_use
                             backgroundColor: Colors.white.withOpacity(0.8),
                             child: const Icon(Icons.person, color: Colors.black54),
                           ),
@@ -120,19 +123,19 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
 
                     // Menu Navigation (Rental, Pemilik, Maps, Setting)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildMenuButton(Icons.car_rental, 'Rental', 1),
-                        _buildMenuButton(Icons.person_outline, 'Pemilik', 2),
-                        _buildMenuButton(Icons.map_outlined, 'Maps', 3),
-                        _buildMenuButton(Icons.settings_outlined, 'Setting', 4),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    //   children: [
+                    //     _buildMenuButton(Icons.car_rental, 'Rental', 1),
+                    //     _buildMenuButton(Icons.person_outline, 'Pemilik', 2),
+                    //     _buildMenuButton(Icons.map_outlined, 'Maps', 3),
+                    //     _buildMenuButton(Icons.settings_outlined, 'Setting', 4),
+                    //   ],
+                    // ),
+                    // const SizedBox(height: 24),
 
                     // Title "Mobil Populer"
                     const Text(
@@ -143,7 +146,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 2),
 
                     // Vertical Car List - DENGAN NAVIGASI KE HALAMAN DETAIL
                     ListView.builder(
@@ -178,6 +181,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildMenuButton(IconData icon, String label, int index) {
     return GestureDetector(
       onTap: () {
